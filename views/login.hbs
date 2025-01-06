@@ -1,0 +1,29 @@
+<head>
+    <link href="/public/css/output.css" rel="stylesheet">
+    <meta charset="UTF-8">
+</head>
+
+{{#if message}}
+<div class="error">{{ message }}</div>
+{{/if}}
+
+<form method="POST" action="login" class="max-w-lg mx-auto p-6 mb-10 bg-nord5 shadow-md">
+    <h2 class="text-xl font-semibold text-nord2 mb-4">Login</h2>
+
+    <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-nord2">Username:</label>
+        <input class="mt-1 w-full border outline-nord2 caret-black" type="text" name="username" value="" required>
+
+    <div class="mb-4"></div>
+    <label for="password" class="block text-sm font-medium text-nord2">Password:</label>
+    <input class="mt-1 w-full border outline-nord2" type="password" name="password" value="" required>
+    </div>
+
+
+    <div>
+        <input
+            class="w-full bg-blue-500 text-white font-semibold py-2 outline outline-nord2 focus:outline-none cursor-pointer"
+            type="submit" value="login">
+    </div>
+
+</form>
