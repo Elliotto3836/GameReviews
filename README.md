@@ -1,1 +1,3 @@
-# GameReviews
+# Game Critics
+
+A website for reviewing games built on Node.JS, Express, Mongoose, and tailwind.
