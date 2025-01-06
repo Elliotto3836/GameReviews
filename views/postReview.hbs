@@ -1,0 +1,47 @@
+<head>
+    <link href="/public/css/output.css" rel="stylesheet">
+    <meta charset="UTF-8">
+</head>
+
+
+{{#if message}}
+<div class="error">{{ message }}</div>
+{{/if}}
+
+<form method="POST" action="/postReview" class="max-w-lg mx-auto p-6 mb-10 bg-nord5 shadow-md rounded-lg">
+    <h2 class="text-xl font-semibold text-nord2 mb-4">Write your review!</h2>
+
+    <div class="mb-4" id = "titleDiv">
+        <label class="block text-sm font-medium text-nord2">Game Title:</label>
+        <input class="mt-1 w-full border outline-nord2" type="text" name="gameTitle" required placeholder="Title">
+    </div>
+
+    <div class="mb-4" id="ratingDiv">
+        <label class="block text-sm font-medium text-nord2">Rating (1 to 10):</label>
+        <input class="mt-1 w-full border outline-nord2" type="number" name="rating" min="1" max="10" required placeholder="Rate it!">
+    </div>
+
+    <div class="mb-4" id = "titleDiv">
+        <label class="block text-sm font-medium text-nord2">Platform:</label>
+        <input  class="mt-1 w-full border outline-nord2" type="text" name="platform" required placeholder="What did you play on?">
+    </div>
+
+    <div class="mb-4" id = "developerDiv">
+        <label class="block text-sm font-medium text-nord2">Developer:</label>
+        <input class="mt-1 w-full border outline-nord2" type="text" name="developer" placeholder="Who made it?">
+    </div>
+
+    <div class="mb-4" id = "hoursDiv">
+        <label class="block text-sm font-medium text-nord2">Hours played:</label>
+        <input class="mt-1 w-full border outline-nord2" type="number" name="hours" placeholder="How long have you played for? (Hours)">
+    </div>
+
+    <div class="mb-4" id "reviewDiv">
+        <label for="reviewText" class="block text-sm font-medium text-nord2">Review:</label>
+        <textarea class="mt-1 w-full border outline-nord2" name="reviewText" rows="6" required placeholder="Write your review here"></textarea>
+    </div>
+
+    <div>
+        <input class="w-full font-semibold py-2 outline outline-nord2 cursor-pointer" type="submit" value="Submit Review">
+    </div>
+</form>

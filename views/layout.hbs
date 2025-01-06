@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="/css/output.css" rel="stylesheet">
+    <meta charset="UTF-8">
+</head>
+
+
+
+<body>
+
+    <header class="bg-nord3 shadow">
+        <div class="container flex justify-between items-center p-4">
+            <div class="flex items-center">
+                <a href="/home">
+                    <img href="/home" src="img/joystick.png" alt="Logo" class="h-10 mr-2 filter invert">
+                </a>
+                <a href="/home" class="text-xl font-semibold text-nord6 ml-100">Game Critic</a>
+            </div>
+
+            <div class="text-nord6">
+
+                <nav class="flex space-x-4">
+                    {{#if user}}
+                    <div>Logged in as: {{user.username}}</div>
+                    <a href="/postReview" class="text-nord6">Post Review</a>
+                    <a href="/wrapped" class="text-nord6">Download your Wrapped!</a>
+                    {{else}}
+                    <a href="/register" class="text-nord6">Register</a>
+                    <a href="/login" class="text-nord6">Login</a>
+                    {{/if}}
+            </div>
+
+
+
+            </nav>
+        </div>
+    </header>
+
+    {{{body}}}
+
+
+</body>
+<footer class="footer w-full text-center">
+    <h1>Elliot Zheng</h1>
+    <a href="https://www.flaticon.com/free-icons/game-boy-advance" title="game boy advance icons">Game boy advance icons
+        created by mynamepong - Flaticon</a>
+
+</footer>
+
+</html>
