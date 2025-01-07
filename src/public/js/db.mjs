@@ -5,10 +5,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-console.log("DSN: ");
-console.log(process.env.DSN);
 
-mongoose.connect(process.env.DSN);
+mongoose.connect(process.env.DSN)
+.then(() => console.log('Connected to MongoDB'))
+.catch((err) => {
+  console.error('Error connecting to MongoDB', err);
+  process.exit(1); // Exit the process if connection fails
+});
 
 const UserSchema = new mongoose.Schema({
   username: {type: String, required: true},
@@ -35,3 +38,5 @@ ReviewSchema.plugin(mongooseSlugPlugin, {tmpl: '<%=title%>'});
 
 export const User = mongoose.model('User', UserSchema);
 export const Review = mongoose.model('Review', ReviewSchema);
+
+
