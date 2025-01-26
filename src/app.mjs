@@ -11,7 +11,7 @@ import sanitize from 'mongo-sanitize';
 import dotenv from 'dotenv';
 import { jsPDF } from "jspdf";
 import { unlink } from 'node:fs';
-import { fsyncSync } from 'fs';
+import passport from 'passport';
 
 dotenv.config()
 
@@ -32,6 +32,9 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 const authRequiredPaths = ['/home/create'];
 
 const User = mongoose.model("User");
@@ -39,7 +42,7 @@ const Review = mongoose.model('Review');
 
 app.use((req, res, next) => {
     if (authRequiredPaths.includes(req.path)) {
-        if (!req.session.user) {
+        if (!res.user) {
             res.redirect('/login');
         } else {
             next();
@@ -49,15 +52,16 @@ app.use((req, res, next) => {
     }
 });
 
+
 app.use((req, res, next) => {
-    res.locals.user = req.session.user;
+    res.locals.user = req.user; 
     next();
-});
+  });
 
 // https://expressjs.com/en/resources/middleware/session.html
 
 function isAuthenticated(req, res, next) {
-    if (req.session.user) next()
+    if (req.user) next()
     else next('route')
 }
 
@@ -74,7 +78,7 @@ app.post('/postReview', isAuthenticated, async (req, res) => {
 
     try {
         const { gameTitle, rating, platform, developer, hours, reviewText } = req.body;
-        if (!gameTitle || !rating || !platform || !reviewText || rating < 1 || rating > 10 || !req.session.user) {
+        if (!gameTitle || !rating || !platform || !reviewText || rating < 1 || rating > 10 || !req.user) {
             return res.status(400).render('postReview', {
                 message: "error"
             });
@@ -86,7 +90,7 @@ app.post('/postReview', isAuthenticated, async (req, res) => {
             body: sanitize(reviewText),
             score: sanitize(rating),
             time: sanitize(hours),
-            author: sanitize(req.session.user.username),
+            author: sanitize(req.user.username),
             date: new Date()
         });
 
@@ -103,19 +107,26 @@ app.post('/postReview', isAuthenticated, async (req, res) => {
 
 });
 
-app.post('/login', async (req, res) => {
-    try {
-        const user = await auth.login(
-            sanitize(req.body.username),
-            req.body.password
-        );
-        await auth.startAuthenticatedSession(req, user);
-        res.redirect('/home');
-    } catch (err) {
-        console.log(err);
-        res.render('login');
-    }
-});
+// app.post('/login', async (req, res) => {
+//     try {
+//         const user = await auth.login(
+//             sanitize(req.body.username),
+//             req.body.password
+//         );
+//         await auth.startAuthenticatedSession(req, user);
+//         res.redirect('/home');
+//     } catch (err) {
+//         console.log(err);
+//         res.render('login');
+//     }
+// });
+
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/home',
+    failureRedirect: '/login',
+    failureFlash: true,
+  }));
+  
 
 
 app.get('/', (req, res) => {
@@ -123,30 +134,46 @@ app.get('/', (req, res) => {
 });
 
 app.get('/home', (req, res) => {
-    res.render('home', { user: req.session.user });
+    res.render('home', { user: req.user });
 });
 
 app.get('/register', (req, res) => {
     res.render('register');
 });
 
+// app.post('/register', async (req, res) => {
+//     try {
+//         const newUser = await auth.register(
+//             sanitize(req.body.username),
+//             sanitize(req.body.email),
+//             req.body.password,
+//         );
+//         await auth.startAuthenticatedSession(req, newUser);
+//         res.redirect('/');
+//     } catch (err) {
+//         res.render('register',{message:err});
+//     }
+// });
+
 app.post('/register', async (req, res) => {
     try {
-        const newUser = await auth.register(
-            sanitize(req.body.username),
-            sanitize(req.body.email),
-            req.body.password,
-        );
-        await auth.startAuthenticatedSession(req, newUser);
+      const newUser = await auth.register(
+        sanitize(req.body.username),
+        sanitize(req.body.email),
+        req.body.password
+      );
+      req.login(newUser, (err) => {
+        if (err) return res.redirect('/register');
         res.redirect('/');
+      });
     } catch (err) {
-        res.render('register',{message:err});
+      res.render('register', { message: err });
     }
-});
+  });
 
 app.get('/api/userReviews', isAuthenticated, async (req, res) => {
     try {
-        const userReviews = await Review.find({ author: req.session.user.username });
+        const userReviews = await Review.find({ author: req.user.username });
         res.json(userReviews);
     } catch (e) {
         res.status(500).send('Error fetching reviews');
@@ -165,8 +192,8 @@ app.get('/api/reviews', async (req, res) => {
 //https://raw.githack.com/MrRio/jsPDF/master/docs/index.html
 app.get('/wrapped',isAuthenticated, async (req,res)=>{
     const doc = new jsPDF();
-    const userReviews = await Review.find({ author: req.session.user.username });
-    const name = req.session.user.username;
+    const userReviews = await Review.find({ author: req.user.username });
+    const name = req.user.username;
     const reviewSummary = wrap.getSummary(userReviews);
 
     doc.setFontSize(20);
