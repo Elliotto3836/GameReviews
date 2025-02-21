@@ -108,46 +108,44 @@ passport.use(new LocalStrategy(
   }
 ));
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL
-},async (accessToken, refreshToken, profile, done) => {
-  try {
-    const { id, displayName, emails } = profile;
-    const email = emails[0].value;
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.GOOGLE_CLIENT_ID,
+//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//   callbackURL: process.env.GOOGLE_CALLBACK_URL
+// },async (accessToken, refreshToken, profile, done) => {
+//   try {
+//     const { id, displayName, emails } = profile;
+//     const email = emails[0].value;
 
-    let user = await User.findOne({ email });
+//     let user = await User.findOne({ email });
 
-    if (!user) {
-      user = new User({
-        googleId: id,
-        username: displayName,
-        email: email,
-      });
-      await user.save();
-    }
+//     if (!user) {
+//       user = new User({
+//         googleId: id,
+//         username: displayName,
+//         email: email,
+//       });
+//       await user.save();
+//     }
 
-    return done(null, user);
-  } catch (err) {
-    return done(err);
-  }
-}));
+//     return done(null, user);
+//   } catch (err) {
+//     return done(err);
+//   }
+// }));
 
-// Serialize user into session
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
 
-// Deserialize user from session
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id).exec();
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
-});
+// passport.deserializeUser(async (id, done) => {
+//   try {
+//     const user = await User.findById(id).exec();
+//     done(null, user);
+//   } catch (err) {
+//     done(err, null);
+//   }
+// });
 
 // Register function (no major changes)
 const register = async (username, email, password) => {
