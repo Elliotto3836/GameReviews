@@ -7,6 +7,6 @@ Uses
 - Express
 - Mongoose
 - Tailwind CSS
-
+- Passport
 
 https://gamereviews.onrender.com/
