@@ -41,4 +41,4 @@ jobs:
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
             -d '{"serviceId":"<RENDER_SERVICE_ID>"}' \
-            https://api.render.com/deploy/srv-xxxxxxxxxxxx
+            https://api.render.com/deploy/$RENDER_SERVICE_ID

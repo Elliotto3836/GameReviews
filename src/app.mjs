@@ -37,7 +37,7 @@ app.use(passport.session());
 
 const authRequiredPaths = ['/home/create'];
 
-const User = mongoose.model("User");
+//const User = mongoose.model("User");
 const Review = mongoose.model('Review');
 
 app.use((req, res, next) => {
@@ -175,7 +175,8 @@ app.get('/api/userReviews', isAuthenticated, async (req, res) => {
     try {
         const userReviews = await Review.find({ author: req.user.username });
         res.json(userReviews);
-    } catch (e) {
+    } catch (err) {
+        console.error(err);
         res.status(500).send('Error fetching reviews');
     }
 });
@@ -185,6 +186,7 @@ app.get('/api/reviews', async (req, res) => {
         const reviews = await Review.find();
         res.json(reviews);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Reviews error');
     }
 });

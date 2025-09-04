@@ -1,3 +1,9 @@
+/* eslint-env mocha */
+/* eslint no-unused-vars: "off" */
+/* eslint no-undef: "off" */
+
+
+
 import { app } from '../app.mjs';
 import { expect } from 'chai';
 import request from "supertest";
