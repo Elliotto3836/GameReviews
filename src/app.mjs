@@ -268,5 +268,10 @@ app.get('/wrapped',isAuthenticated, async (req,res)=>{
 })
 
 
-app.listen(process.env.PORT ?? 3000);
+if (process.env.NODE_ENV !== "test") {
+  app.listen(process.env.PORT ?? 3000, () => {
+    console.log("Server running on port", process.env.PORT ?? 3000);
+  });
+}
+
 export {app};
