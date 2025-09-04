@@ -9,6 +9,9 @@ on:
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
+  
+    env:
+      DSN: ${{ secrets.MONGO_URI }}
 
     steps:
       # 1. Checkout code
