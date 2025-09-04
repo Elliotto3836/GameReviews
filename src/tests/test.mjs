@@ -115,12 +115,5 @@ describe("API", function (){
     expect(response.header['content-type']).to.include('application/json');
   });
 
-  after(async function () {
-    if (process.env.NODE_ENV === 'test') {
-      await mongoose.connection.dropDatabase();
-      console.log('Test database dropped');
-    }
-    await mongoose.connection.close();
-  });
 });
 
