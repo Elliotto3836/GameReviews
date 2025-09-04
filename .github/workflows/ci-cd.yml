@@ -1,0 +1,44 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - uses: actions/checkout@v3
+
+      # 2. Set up Node.js
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.19.4
+
+      # 3. Install dependencies
+      - run: npm install
+
+      # 4. Lint code
+      - name: Lint code
+        run: npm run lint
+
+      # 5. Run tests
+      - name: Run tests
+        run: npm test
+
+      # 6. Deploy to Render (only if lint & tests pass)
+      - name: Deploy to Render
+        if: success()
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"serviceId":"<YOUR_RENDER_SERVICE_ID>"}' \
+            https://api.render.com/deploy/srv-xxxxxxxxxxxx
