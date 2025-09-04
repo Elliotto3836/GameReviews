@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DSN_TEST: ${{ secrets.DSN_TEST}}  
+      DSN_TEST: ${{ secrets.DSN_TEST }}
       RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      NODE_ENV: test
 
 
     steps:
