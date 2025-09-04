@@ -47,7 +47,7 @@ describe("Sign up", function (){
       password: userData.password,
     })
 
-    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(302);
     expect(response.body).to.be.an('object');
     const home = await agent.get('/home').expect(200);
     expect(home.text).to.include('Logged in as: newUserTest2!');
