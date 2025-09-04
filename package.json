@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "start": "node src/app.mjs",
-    "test": "mocha tests/test.mjs"
+    "test": "mocha 'src/tests/**/*.mjs'"
   },
   "keywords": [],
   "author": "",
