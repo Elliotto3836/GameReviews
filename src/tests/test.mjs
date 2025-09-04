@@ -12,7 +12,9 @@ import mongoose from 'mongoose';
 const User = mongoose.model("User");
 const Review = mongoose.model('Review');
 
-
+after(async () => {
+  await mongoose.connection.close();
+});
 
 describe('Setup', function () {
   this.timeout(10000);
