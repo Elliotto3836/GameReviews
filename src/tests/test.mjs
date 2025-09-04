@@ -2,109 +2,119 @@
 /* eslint no-unused-vars: "off" */
 /* eslint no-undef: "off" */
 
-
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();  
 
 import { app } from '../app.mjs';
 import { expect } from 'chai';
-import request from "supertest";
+import request from 'supertest';
 
+import Review from '../models/Review.mjs';
+import User from '../models/User.mjs';
+
+// Connect to test DB
+before(async function () {
+  const mongoUri = process.env.DSN_TEST || process.env.DSN;
+  await mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+});
+
+// Clear collections before each test
+beforeEach(async function () {
+  await Review.deleteMany({});
+  await User.deleteMany({});
+});
+
+// Close DB connection after all tests
+after(async function () {
+  await mongoose.connection.close();
+});
+
+// Helper functions
+async function signupAndLogin(agent, userData) {
+  await agent.post('/register').send(userData);
+  await agent.post('/login').send(userData);
+}
+
+async function postReview(agent, review) {
+  return agent.post('/postReview').send(review);
+}
+
+// ------------------- Tests -------------------
 
 describe('Setup', function () {
-    describe('GET /', async function () {
-      it('should redirect to home page', async function () {
-        const response = await request(app).get('/');
-        expect(response.redirect).to.eql(true);
-        expect(response.status).to.eql(302);
-        expect(response.headers.location).to.eql('/home');
-      });
+  describe('GET /', function () {
+    it('should redirect to home page', async function () {
+      const response = await request(app).get('/');
+      expect(response.status).to.eql(302);
+      expect(response.headers.location).to.eql('/home');
+    });
   });
 });
 
-//https://www.npmjs.com/package/supertest
-describe("Sign up", function (){
+describe('User Authentication', function () {
+  const testUser = {
+    username: 'newUserTest2!',
+    password: 'testing!',
+    email: 'userTesting@testing.com',
+  };
 
-  
-  it('should create a new user and return the user object', async () => {
-    let agent = request.agent(app);
-    
-    const userData = {
-      username: 'newUserTest2!',
-      password: "testing!",
-      email: 'userTesting@testing.com'
-    };
+  it('should sign up and log in a new user', async function () {
+    const agent = request.agent(app);
+    await signupAndLogin(agent, testUser);
 
-
-    const response = await request(app).post('/register').send(userData);
-
-    const login = await agent.post('/login').send({
-      username: userData.username,
-      password: userData.password,
-    })
-
-    expect(response.status).to.equal(200);
-    expect(response.body).to.be.an('object');
     const home = await agent.get('/home').expect(200);
-    expect(home.text).to.include('Logged in as: newUserTest2!');
-
+    expect(home.text).to.include(`Logged in as: ${testUser.username}`);
   });
-});
 
-describe("Log in", function(){
-  it("should be able to log in ", async()=>{
-    let agent = request.agent(app);
-    
-    const userData = {
-      username: 'newUserTest2!',
-      password: "testing!",
-    };
+  it('should log in an existing user', async function () {
+    const agent = request.agent(app);
+    await signupAndLogin(agent, testUser); // ensure user exists
 
-
-    const response = await agent.post('/login').send(userData);
-    const home = await agent.get('/home').expect(200);
+    const response = await agent.post('/login').send({
+      username: testUser.username,
+      password: testUser.password,
+    });
 
     expect(response.status).to.equal(302);
+  });
+});
 
-  })
-})
+describe('Posting Reviews', function () {
+  const testUser = {
+    username: 'newUserTest2!',
+    password: 'testing!',
+    email: 'userTesting@testing.com',
+  };
 
-describe("Posting", function (){
-  
-  it('should be able to post a review', async () => {
-    let agent = request.agent(app);
-    
-    const userData = {
-      username: 'newUserTest2!',
-      password: "testing!",
-    };
+  it('should post a new review', async function () {
+    const agent = request.agent(app);
+    await signupAndLogin(agent, testUser);
 
-
-    const response = await agent.post('/login').send(userData);
-
-    const reviewTemplate={
-      gameTitle: "Big test adventure",
-      platform: "Chrome",
-      developer: "Elliot",
-      reviewText: "Testing review",
+    const reviewData = {
+      gameTitle: 'Big test adventure',
+      platform: 'Chrome',
+      developer: 'Elliot',
+      reviewText: 'Testing review',
       hours: 99,
       rating: 10,
-    }
+    };
 
-    const postResponse = await agent.post('/postReview').send(reviewTemplate);
-    const home = await agent.get('/home').expect(200);
-
-    expect(response.status).to.equal(302);
+    const postResponse = await postReview(agent, reviewData);
     expect(postResponse.status).to.equal(200);
-    expect(home.status).to.equal(200);
 
+    const home = await agent.get('/home').expect(200);
+    expect(home.status).to.equal(200);
   });
 });
 
-
-describe("API", function (){  
-  it('should return valid JSON from the api', async function(){
+describe('API', function () {
+  it('should return JSON from /api/reviews', async function () {
     const response = await request(app).get('/api/reviews');
     expect(response.status).to.eql(200);
     expect(response.header['content-type']).to.include('application/json');
   });
 });
-
