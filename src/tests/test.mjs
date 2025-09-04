@@ -7,6 +7,15 @@
 import { app } from '../app.mjs';
 import { expect } from 'chai';
 import request from "supertest";
+import mongoose from 'mongoose';
+
+const User = mongoose.model("User");
+const Review = mongoose.model('Review');
+
+beforeEach(async () => {
+  await User.deleteMany({});
+  await Review.deleteMany({});
+});
 
 
 describe('Setup', function () {
@@ -42,7 +51,7 @@ describe("Sign up", function (){
       password: userData.password,
     })
 
-    expect(response.status).to.equal(200);
+    expect(response.status).to.equal(302);
     expect(response.body).to.be.an('object');
     const home = await agent.get('/home').expect(200);
     expect(home.text).to.include('Logged in as: newUserTest2!');

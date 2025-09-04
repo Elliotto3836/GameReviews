@@ -32,13 +32,29 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+const User = mongoose.model("User");
+const Review = mongoose.model('Review');
+
 app.use(passport.initialize());
+
+passport.serializeUser((user, done) => {
+  if (!user || !user._id) return done(new Error("Invalid user object"));
+  done(null, user._id); // store only user ID in session
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user || false);
+  } catch (err) {
+    done(err);
+  }
+});
+
 app.use(passport.session());
 
 const authRequiredPaths = ['/home/create'];
 
-//const User = mongoose.model("User");
-const Review = mongoose.model('Review');
 
 app.use((req, res, next) => {
     if (authRequiredPaths.includes(req.path)) {
@@ -124,7 +140,6 @@ app.post('/postReview', isAuthenticated, async (req, res) => {
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/home',
     failureRedirect: '/login',
-    failureFlash: true,
   }));
   
 

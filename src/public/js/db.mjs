@@ -4,14 +4,21 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+let dbUri;
 
+if (process.env.NODE_ENV === "test") {
+  dbUri = process.env.DSN_TEST;
+} else {
+  dbUri = process.env.DSN;
+}
 
-mongoose.connect(process.env.DSN)
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => {
-  console.error('Error connecting to MongoDB', err);
-  process.exit(1); // Exit the process if connection fails
-});
+mongoose.connect(dbUri)
+  .then(() => console.log(`Connected to MongoDB`))
+  .catch(err => {
+    console.error("Error connecting to MongoDB", err);
+    process.exit(1);
+  });
+
 
 const UserSchema = new mongoose.Schema({
   username: {type: String, required: true},
