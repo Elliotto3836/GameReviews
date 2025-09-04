@@ -12,10 +12,6 @@ import mongoose from 'mongoose';
 const User = mongoose.model("User");
 const Review = mongoose.model('Review');
 
-beforeEach(async () => {
-  await User.deleteMany({});
-  await Review.deleteMany({});
-});
 
 
 describe('Setup', function () {
